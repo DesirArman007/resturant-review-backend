@@ -11,17 +11,27 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class User {
+
+public class Address {
 
     @Field(type = FieldType.Keyword)
-    private String id;
+    private String streetNum;
 
     @Field(type = FieldType.Text)
-    private String username;
+    private String streetName;
+
+    @Field(type = FieldType.Keyword)
+    private String unit;
 
     @Field(type = FieldType.Text)
-    private String givenName;
+    private String city;
 
-    @Field(type = FieldType.Text)
-    private String familyName;
+    @Field(type = FieldType.Keyword)
+    private String state;
+
+    @Field(type = FieldType.Keyword)
+    private String postalCode;
+
+    @Field(type = FieldType.Keyword)
+    private String country;
 }
