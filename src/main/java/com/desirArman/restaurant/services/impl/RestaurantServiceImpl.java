@@ -1,7 +1,7 @@
 package com.desirArman.restaurant.services.impl;
 
 import com.desirArman.restaurant.domain.GeoLocation.GeoLocation;
-import com.desirArman.restaurant.domain.RestaurantCreatUpdateRequest;
+import com.desirArman.restaurant.domain.RestaurantCreateUpdateRequest;
 import com.desirArman.restaurant.domain.entities.Address;
 import com.desirArman.restaurant.domain.entities.OperatingHours;
 import com.desirArman.restaurant.domain.entities.Photo;
@@ -25,7 +25,7 @@ public class RestaurantServiceImpl implements RestaurantService {
     private final GeoLocationService geoLocationService;
 
     @Override
-    public Restaurant createRestaurant(RestaurantCreatUpdateRequest request) {
+    public Restaurant createRestaurant(RestaurantCreateUpdateRequest request) {
         Address address = request.getAddress();
         GeoLocation geoLocation = geoLocationService.getLocation(address);
         GeoPoint geoPoint = new GeoPoint(geoLocation.getLatitude(),geoLocation.getLongitude());

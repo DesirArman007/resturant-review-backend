@@ -16,7 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class RestaurantCreatUpdateRequest {
+public class RestaurantCreateUpdateRequest {
 
     private String name;
 
