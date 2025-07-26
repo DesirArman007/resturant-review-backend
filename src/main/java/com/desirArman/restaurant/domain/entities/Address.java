@@ -34,4 +34,21 @@ public class Address {
 
     @Field(type = FieldType.Keyword)
     private String country;
+
+    public String toQueryString() {
+        return String.join(", ",
+                nonNullOrEmpty(streetNum),
+                nonNullOrEmpty(streetName),
+                nonNullOrEmpty(unit),
+                nonNullOrEmpty(city),
+                nonNullOrEmpty(state),
+                nonNullOrEmpty(postalCode),
+                nonNullOrEmpty(country)
+        ).trim();
+    }
+
+    private String nonNullOrEmpty(String s) {
+        return s != null && !s.isBlank() ? s : "";
+    }
+
 }

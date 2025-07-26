@@ -29,7 +29,6 @@ public class Restaurant {
     @Field(type = FieldType.Text)
     private String name;
 
-
     @Field(type = FieldType.Text)
     private String cuisineType;
 

@@ -9,6 +9,8 @@ import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -31,5 +33,13 @@ public class Review {
 
     @Field(type = FieldType.Date, format = DateFormat.date_hour_minute_second)
     private LocalDateTime edited;
+
+    @Field(type = FieldType.Nested)
+    private List<Photo> photos = new ArrayList<>();
+
+    @Field(type = FieldType.Nested)
+    private User writtenBy;
+
+
 }
 
