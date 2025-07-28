@@ -1,5 +1,6 @@
 package com.desirArman.restaurant.mappers;
 
+import com.desirArman.restaurant.domain.GeoLocation.GeoLocation;
 import com.desirArman.restaurant.domain.RestaurantCreateUpdateRequest;
 import com.desirArman.restaurant.domain.dtos.GeoPointDto;
 import com.desirArman.restaurant.domain.dtos.RestaurantCreateUpdateRequestDto;
@@ -13,11 +14,14 @@ import org.springframework.data.elasticsearch.core.geo.GeoPoint;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface RestaurantMapper {
 
+    @Mapping(source = "photoIds", target = "photoIds")
     RestaurantCreateUpdateRequest toRestaurantCreateUpdateRequest(RestaurantCreateUpdateRequestDto dto);
 
     RestaurantDto toRestaurantDto(Restaurant restaurant);
 
-    @Mapping(target = "latitude", expression = "java(geoPoint.getLat())")
-    @Mapping(target = "longitude", expression = "java(geoPoint.getLon())")
+//    @Mapping(target = "latitude", expression = "java(geoPoint.getLat())")
+//    @Mapping(target = "longitude", expression = "java(geoPoint.getLon())")
     GeoPointDto toGeoPointDto(GeoPoint geoPoint);
+    GeoLocation toGeoLocation(GeoPointDto dto);
+
 }

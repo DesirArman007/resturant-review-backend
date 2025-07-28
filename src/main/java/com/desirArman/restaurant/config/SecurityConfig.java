@@ -19,7 +19,8 @@ public class SecurityConfig {
         httpSecurity
                 .authorizeHttpRequests(auth ->
                         auth
-                                .requestMatchers(HttpMethod.GET, "/api/v1/photos/**").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/photos/**").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/api/restaurants/**").permitAll()
                                 .anyRequest().authenticated())
                 .oauth2ResourceServer(
                         oauth2 -> oauth2.jwt(

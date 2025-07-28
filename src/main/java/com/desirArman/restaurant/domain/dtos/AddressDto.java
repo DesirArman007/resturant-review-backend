@@ -18,7 +18,7 @@ public class AddressDto {
 
     @NotBlank(message = "Street Number is required")
     @Pattern(regexp = "^[0-9]{1,5}[a-zA-Z]?$", message = "Invalid street number format")
-    private String streetNum;
+    private String streetNumber;
 
     @NotBlank(message = "Street name is required")
     private String streetName;

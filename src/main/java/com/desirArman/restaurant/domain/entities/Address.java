@@ -15,7 +15,7 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 public class Address {
 
     @Field(type = FieldType.Keyword)
-    private String streetNum;
+    private String streetNumber;
 
     @Field(type = FieldType.Text)
     private String streetName;
@@ -37,7 +37,7 @@ public class Address {
 
     public String toQueryString() {
         return String.join(", ",
-                nonNullOrEmpty(streetNum),
+                nonNullOrEmpty(streetNumber),
                 nonNullOrEmpty(streetName),
                 nonNullOrEmpty(unit),
                 nonNullOrEmpty(city),

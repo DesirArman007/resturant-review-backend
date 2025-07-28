@@ -12,7 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping(path = "/api/v1/photos")
+@RequestMapping(path = "/api/photos")
 public class PhotoController {
 
     private final PhotoService photoService;

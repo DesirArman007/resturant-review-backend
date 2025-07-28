@@ -57,9 +57,9 @@ public class RandomIndiaGeoLocationService implements GeoLocationService {
 
             if (root.isArray() && root.size() > 0) {
                 JsonNode obj = root.get(0);
-                double lat = Double.parseDouble(obj.get("lat").asText());
-                double lon = Double.parseDouble(obj.get("lon").asText());
-                return new GeoLocation(lat, lon);
+                double latitude = Double.parseDouble(obj.get("lat").asText());
+                double longitude = Double.parseDouble(obj.get("lon").asText());
+                return new GeoLocation(latitude, longitude);
             }
 
             log.warn("No location found for address: {}", query);
@@ -70,10 +70,10 @@ public class RandomIndiaGeoLocationService implements GeoLocationService {
 
         // Fallback to random Indian coordinates
         Random random = new Random();
-        double fallbackLat = MIN_LATITUDE + random.nextDouble() * (MAX_LATITUDE - MIN_LATITUDE);
-        double fallbackLon = MIN_LONGITUDE + random.nextDouble() * (MAX_LONGITUDE - MIN_LONGITUDE);
+        double latitude = MIN_LATITUDE + random.nextDouble() * (MAX_LATITUDE - MIN_LATITUDE);
+        double longitude = MIN_LONGITUDE + random.nextDouble() * (MAX_LONGITUDE - MIN_LONGITUDE);
 
-        return new GeoLocation(fallbackLat, fallbackLon);
+        return new GeoLocation(latitude, longitude);
     }
 
 }
