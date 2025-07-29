@@ -31,6 +31,6 @@ public class RestaurantCreateUpdateRequestDto {
     @Valid
     private OperatingHoursDto operatingHours;
 
-    @Size(min=1, message = "At lest one photo ID is required")
+    @Size(min=1, message = "At least one photo ID is required ")
     private List<String> photoIds;
 }

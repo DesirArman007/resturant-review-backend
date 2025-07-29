@@ -16,24 +16,24 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 @Builder
 public class AddressDto {
 
-    @NotBlank(message = "Street Number is required")
-    @Pattern(regexp = "^[0-9]{1,5}[a-zA-Z]?$", message = "Invalid street number format")
+    @NotBlank(message = "Street Number is required ")
+    @Pattern(regexp = "^[0-9]{1,5}[a-zA-Z]?$", message = "Invalid street number format ")
     private String streetNumber;
 
-    @NotBlank(message = "Street name is required")
+    @NotBlank(message = "Street name is required ")
     private String streetName;
 
     private String unit;
 
-    @NotBlank(message = "City name is required")
+    @NotBlank(message = "City name is required ")
     private String city;
 
-    @NotBlank(message = "State name is required")
+    @NotBlank(message = "State name is required ")
     private String state;
 
-    @NotBlank(message = "PostalCode is required")
+    @NotBlank(message = "PostalCode is required ")
     private String postalCode;
 
-    @NotBlank(message = "Country name is required")
+    @NotBlank(message = "Country name is required ")
     private String country;
 }

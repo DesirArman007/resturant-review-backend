@@ -14,7 +14,6 @@ import org.springframework.data.elasticsearch.core.geo.GeoPoint;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface RestaurantMapper {
 
-    @Mapping(source = "photoIds", target = "photoIds")
     RestaurantCreateUpdateRequest toRestaurantCreateUpdateRequest(RestaurantCreateUpdateRequestDto dto);
 
     RestaurantDto toRestaurantDto(Restaurant restaurant);
