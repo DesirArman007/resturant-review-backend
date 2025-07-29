@@ -27,7 +27,7 @@ public interface RestaurantMapper {
     RestaurantSummaryDto toSummaryDto(Restaurant restaurant);
 
     @Named("populateTotalReviews")
-    private Integer populateTotalReviews(List<Review> reviews){
+    default Integer populateTotalReviews(List<Review> reviews){
         return  reviews.size();
     }
 
