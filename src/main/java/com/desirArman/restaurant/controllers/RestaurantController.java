@@ -64,10 +64,28 @@ public class RestaurantController {
     }
 
     @GetMapping(path = "/{restaurant_id}")
-    private ResponseEntity<RestaurantDto> getRestaurant(@PathVariable("restaurant_id") String restaurantId) {
+    public ResponseEntity<RestaurantDto> getRestaurant(@PathVariable("restaurant_id") String restaurantId) {
         Restaurant restaurant = restaurantService.getRestaurant(restaurantId)
                 .orElseThrow(() -> new EntityNotFoundException("Restaurant not found with id: " + restaurantId));
         RestaurantDto restaurantDto = restaurantMapper.toRestaurantDto(restaurant);
         return ResponseEntity.ok(restaurantDto);
     }
+
+
+    @PutMapping(path = "/{restaurant_id}")
+    public ResponseEntity<RestaurantDto> updateRestaurant(
+            @PathVariable("restaurant_id")String restaurantId,
+            @Valid @RequestBody RestaurantCreateUpdateRequestDto requestDto
+    ){
+        RestaurantCreateUpdateRequest request = restaurantMapper.toRestaurantCreateUpdateRequest(requestDto);
+
+        Restaurant updatedRestaurant = restaurantService.updateRestaurant(restaurantId,request);
+
+        RestaurantDto updatedRestaurantDto = restaurantMapper.toRestaurantDto(updatedRestaurant);
+
+        return ResponseEntity.ok(updatedRestaurantDto);
+    }
+
+
+
 }
