@@ -21,9 +21,10 @@ public class ErrorController {
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<ErrorDto> handleEntityNotFoundException(EntityNotFoundException ex){
+        log.error("Caught EntityNotFoundException",ex);
         ErrorDto error = ErrorDto.builder()
                 .status(HttpStatus.NOT_FOUND.value())
-                .message(ex.getMessage())
+                .message("The specified restaurant not found, also here is system generated error msg: "+ ex.getMessage())
                 .build();
 
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
