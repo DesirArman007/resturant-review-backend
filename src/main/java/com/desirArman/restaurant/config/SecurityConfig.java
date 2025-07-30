@@ -21,6 +21,7 @@ public class SecurityConfig {
                         auth
                                 .requestMatchers(HttpMethod.GET, "/api/photos/**").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/api/restaurants/**").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/restaurants/**").permitAll()
                                 .requestMatchers(HttpMethod.GET,"/api/restaurants/search").permitAll()
                                 .anyRequest().authenticated())
                 .oauth2ResourceServer(

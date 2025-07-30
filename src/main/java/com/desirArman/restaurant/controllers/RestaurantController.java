@@ -5,6 +5,7 @@ import com.desirArman.restaurant.domain.dtos.RestaurantCreateUpdateRequestDto;
 import com.desirArman.restaurant.domain.dtos.RestaurantDto;
 import com.desirArman.restaurant.domain.dtos.RestaurantSummaryDto;
 import com.desirArman.restaurant.domain.entities.Restaurant;
+import com.desirArman.restaurant.exceptions.EntityNotFoundException;
 import com.desirArman.restaurant.mappers.RestaurantMapper;
 import com.desirArman.restaurant.services.RestaurantService;
 import jakarta.validation.Valid;
@@ -27,7 +28,7 @@ public class RestaurantController {
     private final RestaurantMapper restaurantMapper;
 
     @PostMapping
-    public ResponseEntity<RestaurantDto> createRestaurant(@Valid @RequestBody RestaurantCreateUpdateRequestDto requestDto){
+    public ResponseEntity<RestaurantDto> createRestaurant(@Valid @RequestBody RestaurantCreateUpdateRequestDto requestDto) {
 
         // These debug prints can be uncommented to verify DTO mapping during development.
         //System.out.println("Incoming DTO: " + requestDto);
@@ -42,23 +43,31 @@ public class RestaurantController {
     }
 
     @GetMapping(path = "/search")
-    private Page<RestaurantSummaryDto> searchResturants(
-             @RequestParam(required = false) String q,
-             @RequestParam(required = false) Float minRating,
-             @RequestParam(required = false) Float latitude,
-             @RequestParam(required = false) Float longitude,
-             @RequestParam(required = false) Float readius,
-             @RequestParam(defaultValue = "1") int page,
-             @RequestParam(defaultValue = "20") int size
+    public Page<RestaurantSummaryDto> searchResturants(
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) Float minRating,
+            @RequestParam(required = false) Float latitude,
+            @RequestParam(required = false) Float longitude,
+            @RequestParam(required = false) Float readius,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "20") int size
 
-    ){
+    ) {
         Page<Restaurant> searchResults = restaurantService.searchRestaurants(
-                q,minRating,latitude,longitude,readius, PageRequest.of(page - 1, size)
+                q, minRating, latitude, longitude, readius, PageRequest.of(page - 1, size)
         );
 
-       return searchResults
-               .map(restaurant -> restaurantMapper
+        return searchResults
+                .map(restaurant -> restaurantMapper
                         .toSummaryDto(restaurant));
 
+    }
+
+    @GetMapping(path = "/{restaurant_id}")
+    private ResponseEntity<RestaurantDto> getRestaurant(@PathVariable("restaurant_id") String restaurantId) {
+        Restaurant restaurant = restaurantService.getRestaurant(restaurantId)
+                .orElseThrow(() -> new EntityNotFoundException("Restaurant not found with id: " + restaurantId));
+        RestaurantDto restaurantDto = restaurantMapper.toRestaurantDto(restaurant);
+        return ResponseEntity.ok(restaurantDto);
     }
 }

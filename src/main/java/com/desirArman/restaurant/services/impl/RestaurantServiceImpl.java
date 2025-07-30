@@ -1,3 +1,4 @@
+
 package com.desirArman.restaurant.services.impl;
 
 import com.desirArman.restaurant.domain.GeoLocation.GeoLocation;
@@ -6,6 +7,7 @@ import com.desirArman.restaurant.domain.entities.Address;
 import com.desirArman.restaurant.domain.entities.OperatingHours;
 import com.desirArman.restaurant.domain.entities.Photo;
 import com.desirArman.restaurant.domain.entities.Restaurant;
+import com.desirArman.restaurant.exceptions.EntityNotFoundException;
 import com.desirArman.restaurant.repositories.RestaurantRepository;
 import com.desirArman.restaurant.services.GeoLocationService;
 import com.desirArman.restaurant.services.RestaurantService;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -75,5 +78,11 @@ public class RestaurantServiceImpl implements RestaurantService {
 
         // if every single argument is null so we return all restuarnts
         return  restaurantRepository.findAll(pageable);
+    }
+
+    @Override
+    public Optional<Restaurant> getRestaurant(String id) {
+       return restaurantRepository.findById(id);
+
     }
 }
