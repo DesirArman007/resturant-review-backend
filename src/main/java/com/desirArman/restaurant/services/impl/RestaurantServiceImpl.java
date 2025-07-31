@@ -112,4 +112,12 @@ public class RestaurantServiceImpl implements RestaurantService {
         return  restaurantRepository.save(restaurant);
 
     }
+
+    @Override
+    public void deleteRestaurant(String id) {
+        Restaurant restaurant = getRestaurant(id)
+                .orElseThrow(()-> new EntityNotFoundException("Restaurant not found with id: "+id));
+
+        restaurantRepository.deleteById(id);
+    }
 }
