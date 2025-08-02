@@ -11,11 +11,14 @@ import com.desirArman.restaurant.exceptions.ReviewNotAllowedException;
 import com.desirArman.restaurant.repositories.RestaurantRepository;
 import com.desirArman.restaurant.services.ReviewService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -25,19 +28,19 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public Review createReview(User author, String restaurantId, ReviewCreateUpdateRequest request) {
-       Restaurant restaurant= getRestaurantOrThrow(restaurantId);
+        Restaurant restaurant = getRestaurantOrThrow(restaurantId);
 
-       boolean hasExsistingReview =  restaurant.getReviews()
-               .stream()
-               .anyMatch(review -> review
-                       .getWrittenBy().getId()
-                       .equals(author.getId()));
+        boolean hasExsistingReview = restaurant.getReviews()
+                .stream()
+                .anyMatch(review -> review
+                        .getWrittenBy().getId()
+                        .equals(author.getId()));
 
-       if (hasExsistingReview){
+        if (hasExsistingReview) {
             throw new ReviewNotAllowedException("User has already reviewed this restaurant");
-       }
+        }
 
-        List<Photo> photos = request.getPhotoIds().stream().map(url ->{
+        List<Photo> photos = request.getPhotoIds().stream().map(url -> {
             return Photo.builder()
                     .url(url)
                     .uploadDate(LocalDateTime.now())
@@ -50,7 +53,7 @@ public class ReviewServiceImpl implements ReviewService {
                 .id(reviewId)
                 .content(request.getContent())
                 .rating(request.getRating())
-                .uploadDate( LocalDateTime.now())
+                .uploadDate(LocalDateTime.now())
                 .edited(LocalDateTime.now())
                 .photos(photos)
                 .writtenBy(author)
@@ -62,9 +65,64 @@ public class ReviewServiceImpl implements ReviewService {
         Restaurant savedRestaurant = restaurantRepository.save(restaurant);
 
         return savedRestaurant.getReviews().stream()
-                .filter(r-> reviewId.equals(r.getId()))
+                .filter(r -> reviewId.equals(r.getId()))
                 .findFirst()
-                .orElseThrow(()-> new RuntimeException("Error retrieving created review"));
+                .orElseThrow(() -> new RuntimeException("Error retrieving created review"));
+    }
+
+    @Override
+    public Page<Review> listReviews(String restaurantId, Pageable pageable) {
+        Restaurant restaurant = getRestaurantOrThrow(restaurantId);
+
+        List<Review> reviews = restaurant.getReviews();
+
+        // for sorting the reviews
+        Sort sort = pageable.getSort();
+        if (sort.isSorted()) {
+            Sort.Order order = sort.iterator().next();
+            String property = order.getProperty();
+            boolean isAscending = order.getDirection().isAscending();
+
+
+            // allowing user to sort thr eviews based on these two properties
+            Comparator<Review> comparator = switch (property) {
+                case "datePosted" -> Comparator.comparing(Review::getUploadDate);
+                case "rating" -> Comparator.comparing(Review::getRating);
+                default -> Comparator.comparing(Review::getUploadDate);
+            };
+
+            reviews.sort(isAscending ? comparator : comparator.reversed());
+        } else {
+            // if the reviews are not sorted then it will arrange the review in order of newest one first
+            reviews.sort(Comparator.comparing(Review::getUploadDate).reversed());
+        }
+
+
+        // pagination
+        int start = (int) pageable.getOffset();
+
+        // handling empty pages
+        if (start >= reviews.size()) {
+            return new PageImpl<>(Collections.emptyList(), pageable, reviews.size());
+        }
+
+        int end = Math.min(start + pageable.getPageSize(), reviews.size());
+
+        return new PageImpl<>(reviews.subList(start, end), pageable, reviews.size());
+    }
+
+
+    private void updateRestaurantAverageRating(Restaurant restaurant) {
+        List<Review> reviews = restaurant.getReviews();
+        if (reviews.isEmpty()) {
+            restaurant.setAverageRating(0.0f);
+        } else {
+            double avgRating = reviews.stream()
+                    .mapToDouble(Review::getRating)
+                    .average().orElse(0.0f);
+
+            restaurant.setAverageRating((float) avgRating);
+        }
     }
 
     private Restaurant getRestaurantOrThrow(String restaurantId) {
@@ -72,16 +130,15 @@ public class ReviewServiceImpl implements ReviewService {
                 .orElseThrow(() -> new EntityNotFoundException("Entity not found with id: " + restaurantId));
     }
 
-    private void updateRestaurantAverageRating(Restaurant restaurant){
-        List<Review> reviews = restaurant.getReviews();
-        if(reviews.isEmpty()){
-            restaurant.setAverageRating(0.0f);
-        } else{
-           double avgRating =  reviews.stream()
-                    .mapToDouble(Review::getRating)
-                    .average().orElse(0.0f);
 
-           restaurant.setAverageRating((float) avgRating);
-        }
+    public Optional<Review> getReview(String restaurantId, String reviewId) {
+        Restaurant restaurant = getRestaurantOrThrow(restaurantId);
+
+        return  restaurant.getReviews()
+                .stream()
+                .filter((review -> reviewId.equals(review.getId())))
+                .findFirst();
     }
+
+
 }
