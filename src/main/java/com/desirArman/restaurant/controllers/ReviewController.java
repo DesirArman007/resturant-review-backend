@@ -6,7 +6,6 @@ import com.desirArman.restaurant.domain.dtos.ReviewCreateUpdateRequestDto;
 import com.desirArman.restaurant.domain.dtos.ReviewDto;
 import com.desirArman.restaurant.domain.entities.Review;
 import com.desirArman.restaurant.domain.entities.User;
-import com.desirArman.restaurant.exceptions.EntityNotFoundException;
 import com.desirArman.restaurant.mappers.ReviewMapper;
 import com.desirArman.restaurant.services.ReviewService;
 import jakarta.validation.Valid;
@@ -65,6 +64,30 @@ public class ReviewController {
                 .map(ResponseEntity::ok)
                 .orElseGet(()-> ResponseEntity.noContent().build());
 
+    }
+
+    @PutMapping(path = "/{reviewId}")
+    public ResponseEntity<ReviewDto> updateReview(
+            @PathVariable String restaurantId,
+            @PathVariable String reviewId,
+            @Valid @RequestBody ReviewCreateUpdateRequestDto requestDto,
+            @AuthenticationPrincipal  Jwt jwt
+    ){
+        ReviewCreateUpdateRequest request = reviewMapper.toReviewCreateUpdateRequest(requestDto);
+        User user = jwtToUser(jwt);
+
+       Review updatedReview =  reviewService.updateReview(user,restaurantId,reviewId,request);
+       ReviewDto updatedReviewDto = reviewMapper.toDto(updatedReview);
+
+       return ResponseEntity.ok(updatedReviewDto);
+    }
+
+
+    @DeleteMapping(path = "/{reviewId}")
+    public ResponseEntity<Void> deleteReview(@PathVariable String restaurantId, @PathVariable String reviewId){
+        reviewService.deleteReview(restaurantId,reviewId);
+
+        return ResponseEntity.noContent().build();
     }
 
     private User jwtToUser(Jwt jwt){
