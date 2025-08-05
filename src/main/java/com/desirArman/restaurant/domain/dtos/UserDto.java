@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
+import java.util.Set;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -20,4 +22,9 @@ public class UserDto {
     private String givenName;
 
     private String familyName;
+
+    private String email;
+
+    private Set<String> roles;
+
 }

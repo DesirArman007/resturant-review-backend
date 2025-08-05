@@ -19,6 +19,10 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(path = "/api/restaurants/{restaurantId}/reviews")
@@ -84,20 +88,28 @@ public class ReviewController {
 
 
     @DeleteMapping(path = "/{reviewId}")
-    public ResponseEntity<Void> deleteReview(@PathVariable String restaurantId, @PathVariable String reviewId){
-        reviewService.deleteReview(restaurantId,reviewId);
+    public ResponseEntity<Void> deleteReview(@PathVariable String restaurantId, @PathVariable String reviewId,@AuthenticationPrincipal  Jwt jwt){
+        User user = jwtToUser(jwt);
+
+        reviewService.deleteReview(restaurantId,reviewId,user);
 
         return ResponseEntity.noContent().build();
     }
 
-    private User jwtToUser(Jwt jwt){
+    private User jwtToUser(Jwt jwt) {
+        List<String> roleList = jwt.getClaimAsMap("realm_access") != null
+                ? (List<String>) ((Map<String, Object>) jwt.getClaim("realm_access")).get("roles")
+                : List.of();
+
         return User.builder()
                 .id(jwt.getSubject())
                 .username(jwt.getClaimAsString("preferred_username"))
                 .givenName(jwt.getClaimAsString("given_name"))
                 .familyName(jwt.getClaimAsString("family_name"))
+                .roles(new HashSet<>(roleList))
                 .build();
     }
+
 
 
 }

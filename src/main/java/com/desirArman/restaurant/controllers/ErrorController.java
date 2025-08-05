@@ -1,10 +1,7 @@
 package com.desirArman.restaurant.controllers;
 
 import com.desirArman.restaurant.domain.dtos.ErrorDto;
-import com.desirArman.restaurant.exceptions.BaseException;
-import com.desirArman.restaurant.exceptions.EntityNotFoundException;
-import com.desirArman.restaurant.exceptions.ReviewNotAllowedException;
-import com.desirArman.restaurant.exceptions.StorageException;
+import com.desirArman.restaurant.exceptions.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +17,17 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ErrorController {
 
+    @ExceptionHandler(UserRegistrationException.class)
+    public ResponseEntity<ErrorDto> handleUserRegistrationException( UserRegistrationException ex){
+        log.error("User registration failed: {}", ex.getMessage());
+
+        ErrorDto error = ErrorDto.builder()
+                .status(HttpStatus.BAD_REQUEST.value()) // 400 Bad Request is a good general status for this
+                .message(ex.getMessage()) // This uses the specific error message we created
+                .build();
+
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
 
     @ExceptionHandler(ReviewNotAllowedException.class)
     public ResponseEntity<ErrorDto> handleReviewNotAllowedException(ReviewNotAllowedException ex){

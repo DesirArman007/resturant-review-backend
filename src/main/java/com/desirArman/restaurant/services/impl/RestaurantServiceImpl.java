@@ -3,10 +3,7 @@ package com.desirArman.restaurant.services.impl;
 
 import com.desirArman.restaurant.domain.GeoLocation.GeoLocation;
 import com.desirArman.restaurant.domain.RestaurantCreateUpdateRequest;
-import com.desirArman.restaurant.domain.entities.Address;
-import com.desirArman.restaurant.domain.entities.OperatingHours;
-import com.desirArman.restaurant.domain.entities.Photo;
-import com.desirArman.restaurant.domain.entities.Restaurant;
+import com.desirArman.restaurant.domain.entities.*;
 import com.desirArman.restaurant.exceptions.EntityNotFoundException;
 import com.desirArman.restaurant.repositories.RestaurantRepository;
 import com.desirArman.restaurant.services.GeoLocationService;
@@ -15,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.core.geo.GeoPoint;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +30,8 @@ public class RestaurantServiceImpl implements RestaurantService {
     private final GeoLocationService geoLocationService;
 
     @Override
-    public Restaurant createRestaurant(RestaurantCreateUpdateRequest request) {
+    @PreAuthorize("hasRole('OWNER')")
+    public Restaurant createRestaurant(User owner, RestaurantCreateUpdateRequest request) {
         Address address = request.getAddress();
         GeoLocation geoLocation = geoLocationService.getLocation(address);
         GeoPoint geoPoint = new GeoPoint(geoLocation.getLatitude(),geoLocation.getLongitude());
@@ -51,6 +51,7 @@ public class RestaurantServiceImpl implements RestaurantService {
                  .operatingHours(request.getOperatingHours())
                  .averageRating(0f)
                  .photos(photos)
+                 .createdBy(owner)
                  .build();
 
        return restaurantRepository.save(restaurant);
@@ -87,9 +88,15 @@ public class RestaurantServiceImpl implements RestaurantService {
     }
 
     @Override
-    public Restaurant updateRestaurant(String id, RestaurantCreateUpdateRequest restaurantCreateUpdateRequest) {
+    @PreAuthorize("hasRole('OWNER')")
+    public Restaurant updateRestaurant(String id, RestaurantCreateUpdateRequest restaurantCreateUpdateRequest, User owner) {
         Restaurant restaurant = getRestaurant(id)
                 .orElseThrow(()-> new EntityNotFoundException("Restaurant not found with id: "+id));
+
+        if (!restaurant.getCreatedBy().getId().equals(owner.getId())) {
+            throw new AccessDeniedException("You can only modify your own restaurants.");
+        }
+
 
         GeoLocation newGeoLocation =geoLocationService.getLocation(restaurantCreateUpdateRequest.getAddress());
 
@@ -114,9 +121,22 @@ public class RestaurantServiceImpl implements RestaurantService {
     }
 
     @Override
-    public void deleteRestaurant(String id) {
+    @PreAuthorize("hasAnyRole('OWNER', 'ADMIN')")
+    public void deleteRestaurant(String id, User caller) {
         Restaurant restaurant = getRestaurant(id)
                 .orElseThrow(()-> new EntityNotFoundException("Restaurant not found with id: "+id));
+
+        boolean isOwner = restaurant.getCreatedBy().getId().equals(caller.getId());
+        boolean isAdmin = caller.getRoles().contains("ADMIN");
+
+        if (!(isOwner || isAdmin)) {
+            throw new AccessDeniedException("You can only delete your own restaurants or be an admin.");
+        }
+
+//        if (!restaurant.getCreatedBy().getId().equals(caller.getId())) {
+//            throw new AccessDeniedException("You can only delete your own restaurants.");
+//        }
+
 
         restaurantRepository.deleteById(id);
     }

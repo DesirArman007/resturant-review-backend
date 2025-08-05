@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -30,6 +31,7 @@ public class ReviewServiceImpl implements ReviewService {
     private final RestaurantRepository restaurantRepository;
 
     @Override
+    @PreAuthorize("hasRole('USER')")
     public Review createReview(User author, String restaurantId, ReviewCreateUpdateRequest request) {
         Restaurant restaurant = getRestaurantOrThrow(restaurantId);
 
@@ -149,6 +151,7 @@ public class ReviewServiceImpl implements ReviewService {
 
 
     @Override
+    @PreAuthorize("hasRole('USER')")
     public Review updateReview(User author, String restaurantId, String reviewId, ReviewCreateUpdateRequest request) {
         Restaurant restaurant = getRestaurantOrThrow(restaurantId);
 
@@ -192,8 +195,24 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public void deleteReview(String restaurantId, String reviewId) {
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+    public void deleteReview(String restaurantId, String reviewId, User caller) {
         Restaurant restaurant = getRestaurantOrThrow(restaurantId);
+
+        Review existingReview = getReviewsFromRestaurant( reviewId, restaurant)
+                .orElseThrow(() -> new ReviewNotAllowedException("Review does not exist"));
+
+
+        boolean isOwner = existingReview.getWrittenBy().getId().equals(caller.getId());
+        boolean isAdmin = caller.getRoles().contains("ADMIN");
+
+        if (!(isOwner || isAdmin)) {
+            throw new ReviewNotAllowedException("You can only delete your own reviews or be an admin.");
+        }
+
+//        if (!existingReview.getWrittenBy().getId().equals(author.getId())) {
+//            throw new ReviewNotAllowedException("You can only delete your own reviews.");
+//        }
 
         List<Review> filteredReviews = restaurant.getReviews().stream()
                 .filter(r -> !reviewId.equals(r.getId()))

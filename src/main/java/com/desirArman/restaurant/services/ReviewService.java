@@ -18,6 +18,6 @@ public interface ReviewService {
 
     Review updateReview(User author, String restaurantId, String reviewId, ReviewCreateUpdateRequest request);
 
-    void deleteReview(String restaurantId, String reviewId);
+    void deleteReview(String restaurantId, String reviewId, User author);
 
 }
