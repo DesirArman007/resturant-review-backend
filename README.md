@@ -2,20 +2,7 @@
 
 This is a Spring Boot backend service for a full-stack restaurant review platform. It supports user registration via frontend, JWT-based authentication using Keycloak, and role-based access for managing restaurants and reviews. It also integrates with Elasticsearch, Kibana, and Docker.
 
-src/
-└── main/
-    └── java/
-        └── com.desirArman.restaurant/
-            ├── config/             # Keycloak config, security
-            ├── controllers/        # REST API controllers
-            ├── domain/
-            │   ├── dtos/           # DTOs for API requests/responses
-            │   ├── entities/       # JPA Entities
-            │   └── GeoLocation/    # Embedded location data
-            ├── exceptions/         # Custom exception handling
-            ├── mappers/            # DTO <-> Entity mappers
-            ├── repositories/       # Spring Data JPA Repos
-            └── services/           # Business logic
+<pre> ```bash src/ └── main/ └── java/ └── com.desirArman.restaurant/ ├── config/ # Keycloak config, security ├── controllers/ # REST API controllers ├── domain/ │ ├── dtos/ # DTOs for API requests/responses │ ├── entities/ # JPA Entities │ └── GeoLocation/ # Embedded location data ├── exceptions/ # Custom exception handling ├── mappers/ # DTO <-> Entity mappers ├── repositories/ # Spring Data JPA Repos └── services/ # Business logic ``` </pre>
 
 
 
